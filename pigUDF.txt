@@ -1,0 +1,42 @@
+package pigUDF;
+
+
+
+import java.io.IOException;
+
+import org.apache.pig.EvalFunc;
+
+import org.apache.pig.FilterFunc;
+
+import org.apache.pig.data.Tuple;
+
+
+
+public class District1 extends EvalFunc<String>
+  {
+	public String exec(Tuple input) throws IOException {
+	  if (input == null || input.size() == 0)
+	    return null;
+	  try{
+		  String District;
+		  float Objective;
+		  float Performance, result;
+		  
+		  District= (String)input.get(0);
+	      Objective = Float.parseFloat((String)input.get(1));
+	      Performance = Float.parseFloat((String)input.get(2));
+	      
+	      result = (float)0.8*Objective;
+	       
+	       if(Performance>=result)
+	    	   {
+	    	   return District;
+	    	   }
+	           return "Not";
+	     }catch(Exception e){
+	         e.printStackTrace();
+	         return null;
+	     }
+	  }
+   }
+

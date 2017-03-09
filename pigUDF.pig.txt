@@ -1,0 +1,23 @@
+state = LOAD '/home/acadgild/Downloads/SW.xml' using org.apache.pig.piggybank.storage.XMLLoader('row') as(row1:chararray);
+
+data = foreach state GENERATE FLATTEN(REGEX_EXTRACT_ALL(row1,'<row>\\s*<State_Name>(.*)</State_Name>\\s*<District_Name>(.*)</District_Name>\\s*<Project_Objectives_IHHL_BPL>(.*)</Project_Objectives_IHHL_BPL>\\s*<Project_Objectives_IHHL_APL>(.*)</Project_Objectives_IHHL_APL>\\s*<Project_Objectives_IHHL_TOTAL>(.*)</Project_Objectives_IHHL_TOTAL>\\s*<Project_Objectives_SCW>(.*)</Project_Objectives_SCW>\\s*<Project_Objectives_School_Toilets>(.*)</Project_Objectives_School_Toilets>\\s*<Project_Objectives_Anganwadi_Toilets>(.*)</Project_Objectives_Anganwadi_Toilets>\\s*<Project_Objectives_RSM>(.*)</Project_Objectives_RSM>\\s*<Project_Objectives_PC>(.*)</Project_Objectives_PC>\\s*<Project_Performance-IHHL_BPL>(.*)</Project_Performance-IHHL_BPL>\\s*<Project_Performance-IHHL_APL>(.*)</Project_Performance-IHHL_APL>\\s*<Project_Performance-IHHL_TOTAL>(.*)</Project_Performance-IHHL_TOTAL>\\s*<Project_Performance-SCW>(.*)</Project_Performance-SCW>\\s*<Project_Performance-School_Toilets>(.*)</Project_Performance-School_Toilets>\\s*<Project_Performance-Anganwadi_Toilets>(.*)</Project_Performance-Anganwadi_Toilets>\\s*<Project_Performance-RSM>(.*)</Project_Performance-RSM>\\s*<Project_Performance-PC>(.*)</Project_Performance-PC>\\s*</row>')) AS (State:chararray, District:chararray, ProjectObjectives_BPL:int, Objectives_APL:int, Objectives_Total : int, Objectives_SCW : int, Objectives_School_Toilets : int, Objectives_A_Toilets : int, Objectives_RSM : int, Objectives_PC : int, BPL:int, APL:int, TOTAL:int, SCW:int, S_Toilets:int, A_Toilets:int, RSM:int, PC:int );
+
+
+
+udf_data = FOREACH data generate District,ProjectObjectives_BPL,BPL;
+
+
+
+register /home/acadgild/pigUDF.jar;
+
+
+
+udf_result = FOREACH udf_data generate pigUDF.District1(District,ProjectObjectives_BPL,BPL) as inter;
+
+dump udf_result;
+
+
+
+result = filter udf_result by not inter matches 'Not';
+
+store result into 'hdfs://localhost:9000/pigUDF';
